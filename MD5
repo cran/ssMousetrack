@@ -1,4 +1,4 @@
-ddfe1a1c419d504a3767351977127356 *DESCRIPTION
+7538500eec71c63e0f1b9d18c9660743 *DESCRIPTION
 955aba43516248e59a9ec6a5fa944104 *NAMESPACE
 d41d8cd98f00b204e9800998ecf8427e *NEWS
 117e60225efb7d168e238c58a3be3524 *R/check_prior.R
@@ -12,7 +12,9 @@ b7395dcccf066ef43f9f28df76acf8b7 *R/datasets.R
 fe39c46815a7bbf26303d06f9ac4e890 *R/run_ssm.R
 3f5d16f1e08722d07e59510bde82ff36 *R/ssMousetrack-package.R
 ab702c43966ed6ffd9e041bac04bfd6c *R/stanmodels.R
-aefbc5c00caad6ec520914cfe1c22bf3 *R/zzz.R
+2f569a48d89eb20173492e221fa355d6 *R/zzz.R
+c5e2f5a689b0bad3a05b39d37b9042f1 *cleanup
+c7af529e4b42845142c21cedcb83bba3 *cleanup.win
 5eac3f4ccc305022ce9bf0f040f9823e *data/congruency.rda
 2fb1888252f74b9bd2fb22a6ceb0550b *data/language.rda
 855c064dbf8deaff96c8dc8a87169109 *inst/include/meta_header.hpp
@@ -27,9 +29,9 @@ a3b5f939850d86c5dce4efb6480cbc16 *man/generate_data.Rd
 2033ba1b3ece3989be3b02d5f2018644 *man/prepare_data.Rd
 a0cdbbb621589696dadf96902801058c *man/run_ssm.Rd
 26eeddf7f1af71a2177f1d485bfeae74 *man/ssMousetrack-package.Rd
-2c0b0ce12d791257f3754d8fd1a6c714 *src/Makevars
-d1bbc8f86ac45ff1704d04ab60323e61 *src/Makevars.win
-27814516508c273f67abed85b3d7f83f *src/init.cpp
+e385b69646bcc4555858feb68eb1f52e *src/Makevars
+243ea954dc0df3ff2890513ded735d9c *src/Makevars.win
+8082964ec8eeba08c2cce2205a6bc05a *src/init.cpp
 c260f06b07ff51c4a305f5d8204c57d7 *src/stan_files/chunks/license.stan
 0a3571adb47d8b3e40b3bb73d6136127 *src/stan_files/fit_model.stan
 5d1bb704dd65818ccfca5bda74ecfa7e *src/stan_files/simulate_data.stan
