@@ -5,7 +5,7 @@
 #' \itemize{
 #' \item \code{lognormal(mu,sigma)} (code = 1, required parameters = 2)
 #' \item \code{normal(mu,sigma)} (code = 2, required parameters = 2)
-#' \item \code{normal(mu,sigma)T(min,max)} (code = 201, required parameters = at least 3)
+#' \item \code{normal(mu,sigma)T(min,max)} (code = 201, required parameters = 4)
 #' \item \code{chi_square(df)} (code = 3, required parameters = 1)
 #' \item \code{inv_chi_square(df)} (code = 4, required parameters = 1)
 #' \item \code{gamma(alpha,beta)} (code = 5, required parameters = 2)
@@ -13,7 +13,7 @@
 #' \item \code{uniform(min,max)} (code = 7, required parameters = 2)
 #' }
 #' This is an internal function, generally not to be called by the user.
-#' @param priors (list) a list of arguments specifying priors for each parameter involved in the model (see Details). If \code{priors=NULL} then predefined vague priors will be returned.
+#' @param priors (list) a list of arguments specifying priors for each parameter involved in the model (see Details). If \code{priors=NULL} then predefined priors will be returned.
 #' @return a matrix contatining priors (numeric codes, see Details) and their parameters
 #' @export
 #' @examples
@@ -44,7 +44,7 @@ check_prior <- function(priors=NULL){
   
   # Check NULL elements in the list and replace them with pre-defined priors
   iid <- which(sapply(priors,is.null)) 
-  priors[iid] <- ifelse(iid==1,"lognormal(1,0.5)","normal(0,1)") #lognormal() is for the dummy intercept of the stimuli equation
+  priors[iid] <- ifelse(iid==1,"lognormal(1,0.5)","normal(0,2)") #lognormal() is for the dummy intercept of the stimuli equation
   
   prior_dist <-mapply(function(i){
     strs <- strsplit(priors[[i]],"[,)T(]")[[1]][1]

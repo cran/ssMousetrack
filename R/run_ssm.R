@@ -11,7 +11,8 @@
 #' @param lambda (numeric) fixed value for the model parameter lambda
 #' @param y_T (numeric) position in angles of the target
 #' @param y_D (numeric) position in angles of the distractor
-#' @param priors (list) a list of arguments specifying priors for each parameter involved in the model (see \code{\link{check_prior}}). If \code{priors="default"} then pre-defined vague priors will be used.
+#' @param priors (list) a list of arguments specifying priors for each parameter involved in the model (see \code{\link{check_prior}}). If \code{priors="default"} then pre-defined tpriors will be used.
+#' @param gfunction (character) type of link function between latent states and observed data: 'logistic', 'gompertz' (\code{default = 'logistic'}).  
 #' @param kappa_bnds (array) array containing the lower and upper bounds for the kappa parameter (\code{default = c(5,300)})
 #' @param nchains (integer) number of chains for the MCMC algorithm
 #' @param niter (integer) number of iterations for each chain
@@ -31,7 +32,7 @@
 #' iid <- 23 # keep just one dataset from the simulated set of datasets
 #' # Run the state-space model on the chosen dataset
 #' X1_fit <- run_ssm(N = X1$N,I = X1$I,J = X1$J,Y = X1$data$Y[iid,,],D = X1$data$D[iid,,],
-#' Z = X1$data$Z,niter=100,nwarmup=25)
+#' Z = X1$data$Z)
 #' 
 #' ## Fit a state-space model using the experimental dataset language
 #' # The dataset is ready to be used and it does not need to be pre-processed (preprocess=FALSE). 
@@ -39,7 +40,8 @@
 #' # the x-y trajectories
 #' X2 <- prepare_data(X = language, preprocess = FALSE, Z.formula = "~condition")
 #' # Run the state-space model on the chosen dataset
-#' X2_fit <- run_ssm(N = X2$N,I = X2$I,J = X2$J,Y = X2$Y,D = X2$D,Z = X2$Z,niter=50,nwarmup=15)
+#' X2_fit <- run_ssm(N = X2$N,I = X2$I,J = X2$J,Y = X2$Y,D = X2$D,Z = X2$Z,
+#' niter=5000,nchains=2)
 #' 
 #' ## Fit a state-space model using the experimental dataset congruency
 #' # The dataset needs to be pre-processed (preprocess=TRUE)
@@ -50,12 +52,12 @@
 #' priors_list <- list("lognormal(1,0.5)","pareto(3,5.25)","normal(0,2.5)")
 #' # note that length(priors_list) = KK 
 #' # Run the state-space model on the chosen dataset
-#' X3_fit <- run_ssm(N = X3$N,I = X3$I,J = X3$J,Y = X3$Y,D = X3$D,Z = X3$Z,niter=50,
-#' nwarmup=15,priors=priors_list)
+#' X3_fit <- run_ssm(N = X3$N,I = X3$I,J = X3$J,Y = X3$Y,D = X3$D,Z = X3$Z,
+#' niter=10000,nwarmup=3500,priors=priors_list,nchains=4)
 #' }
 
 
-run_ssm <- function(N,I,J,Y=NULL,D=NULL,Z=NULL,sigmax=1,lambda=1.5,y_T=pi/4,y_D=(3*pi)/4,priors="default",kappa_bnds=c(5,300),nchains=1,niter=2000,nwarmup=500,ncores="AUTO",stan_object=FALSE,...){
+run_ssm <- function(N,I,J,Y=NULL,D=NULL,Z=NULL,sigmax=1,lambda=1,y_T=pi/4,y_D=(3*pi)/4,priors="default",gfunction=c("logistic","gompertz"),kappa_bnds=c(5,300),nchains=1,niter=2000,nwarmup=500,ncores="AUTO",stan_object=FALSE,...){
   if(I<1| N<1 | J<1)
     stop("Positive integers should be provided for I, J, N, M")
   if(is.null(Z))
@@ -69,6 +71,7 @@ run_ssm <- function(N,I,J,Y=NULL,D=NULL,Z=NULL,sigmax=1,lambda=1.5,y_T=pi/4,y_D=
   if(length(priors)==1 && priors=="default")
     priors <- rep(list(NULL),dim(Z)[2])
   
+  gfunction=match.arg(gfunction)
   
   lb <- 0.1 #to avoid the case y[n]~0
   
@@ -90,8 +93,13 @@ run_ssm <- function(N,I,J,Y=NULL,D=NULL,Z=NULL,sigmax=1,lambda=1.5,y_T=pi/4,y_D=
     priors_matrix = check_prior(priors)
   )
 
-  out <- rstan::sampling(stanmodels$fit_model,chains=nchains,iter=niter,warmup=nwarmup,data=datastan,cores=ncores,...)
-  data_out <- rstan::extract(out,pars=c("b","z_upd","y_star","gamma"))
+  if(gfunction=="logistic"){
+    out <- rstan::sampling(stanmodels$fit_model_log,chains=nchains,iter=niter,warmup=nwarmup,data=datastan,cores=ncores,...)
+  }else if(gfunction=="gompertz"){
+    out <- rstan::sampling(stanmodels$fit_model_gomp,chains=nchains,iter=niter,warmup=nwarmup,data=datastan,cores=ncores,...)
+  }
+    
+  data_out <- rstan::extract(out,pars=c("b","z_pred","y_star","gamma","z_s_upd"))
 
   gamma_out = data.frame(data_out$gamma)
   names(gamma_out) = paste("gamma",seq(1,dim(gamma_out)[2]),sep="")
@@ -100,8 +108,9 @@ run_ssm <- function(N,I,J,Y=NULL,D=NULL,Z=NULL,sigmax=1,lambda=1.5,y_T=pi/4,y_D=
     I = I,
     N = N,
     J = J,
+    Gfunction = gfunction,
     params = list(sigmax=sigmax,lambda=lambda,kappa_bnds=kappa_bnds,gamma=gamma_out,beta=data_out$b,kappa),
-    data = list(Y=Y,X=data_out$z_upd,MU=data_out$y_star,D=D,Z=Z),
+    data = list(Y=Y,X=data_out$z_pred,MU=data_out$y_star,D=D,Z=Z,X_smooth=data_out$z_s_upd),
     stan_table = rstan::monitor(out)
   )
   

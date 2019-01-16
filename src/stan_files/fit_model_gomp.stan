@@ -1,6 +1,6 @@
 functions{
   
-  vector kronecker_simplified_J(int I, int J, vector x){ //simplified version to reproduce vectors like a_vec
+  vector kronecker_simplified_J(int I, int J, vector x){ 
     matrix[I,J] X;
     vector[I*J] x_vec;
     for(i in 1:I){
@@ -9,7 +9,7 @@ functions{
     return x_vec;
   }
   
-  vector kronecker_simplified_I(int I, int J, vector x){ //simplified version to reproduce vectors like b_vec
+  vector kronecker_simplified_I(int I, int J, vector x){ 
     matrix[I,J] X;
     vector[I*J] x_vec;
     for(i in 1:I){
@@ -47,7 +47,7 @@ data{
 
 parameters{
   real<lower=0> gamma_0;
-  vector<lower=-gamma_0>[KK-1] gamma_1; // because of the Gompertz function
+  vector<lower=-gamma_0>[KK-1] gamma_1; // to preserve the meaning of the dummy code
 }
 
 transformed parameters{
@@ -56,31 +56,36 @@ transformed parameters{
   vector<lower=0>[I] lambda_pred[N]; // latent states (variance: VAR[X]) in the prediction stage of the Kalman filter loop
   vector<lower=0>[I] lambda_upd[N]; // latent states (variance: VAR[X]) in the prediction stage of the Kalman filter loop
   vector<lower=0>[I*J] sigma_kf[N]; // working variables for the Kalman filter loop
+  vector[I*J] kappa_vec; // working variables for the Kalman filter loop
   vector[I*J] y_star[N]; // predicted Y-trajectories in the Kalman filter loop
   vector[I*J] G; // working variables for the Kalman filter loop
   vector[I*J] z_vec; // working variables for the Kalman filter loop
   vector[I*J] lambda_pred_vec; // working variables for the Kalman filter loop
-  vector[I*J] b; // working variables for the Kalman filter loop
+  vector<lower=0>[I*J] b; // working variables for the Kalman filter loop
   vector[KK] gamma; // array of model parameters
   
   gamma = append_row(gamma_0,gamma_1);
   b = D*gamma; 
   
+  
   // ************************************** adapted-KALMAN FILTER loop ************************************** //
   z_pred[1] = rep_vector(1e-04,I);
   lambda_pred[1] = rep_vector(1,I);
+  kappa_vec = sqrt(1 ./ rep_vector(kappa_lb,I*J));
   
   for(n in 1:N){
-    // Prediction
     if(n>1){
+      // Prediction
       z_pred[n] = z_upd[n-1];
       lambda_pred[n] = lambda_upd[n-1] + sigmaz;
+      
+      kappa_vec = sqrt(1 ./ rescale_data((exp(lambda_vec .* DY[n])),kappa_lb,kappa_ub)); 
     }
     // Working variables
     z_vec = kronecker_simplified_J(I,J,z_pred[n]);
     lambda_pred_vec = kronecker_simplified_J(I,J,lambda_pred[n]);
-    y_star[n] = bnds[,1] + (bnds[,3] .* exp(-b .* exp(-a .* z_vec)));
-    sigma_kf[n] = lambda_pred_vec + sqrt(1 ./ rescale_data((exp(lambda_vec .* DY[n])),kappa_lb,kappa_ub));
+    y_star[n] = bnds[,1] + (bnds[,3] .* exp(-b .* exp(-z_vec))); // generalized gompertz function
+    sigma_kf[n] = lambda_pred_vec + kappa_vec;
     G  = lambda_pred_vec ./ sigma_kf[n];
 
     // Updating
@@ -88,7 +93,7 @@ transformed parameters{
     lambda_upd[n] = lambda_pred[n] - ((G .* sigma_kf[n] .* G)' * Am)';
   }
   // ************************************** ************************** ************************************** //
-  
+
 }
 
 model{
@@ -120,5 +125,31 @@ model{
   // marginal likelihood of the model
   for(n in 1:N){
     Y[n] ~ multi_normal(y_star[n],diag_matrix(sigma_kf[n]));
+  }
+}
+
+generated quantities{
+  // Fixed-Interval backward smoother 
+  vector[I] z_s_pred[N];
+  vector[I] z_s_upd[N]; 
+  vector[I] lambda_s_pred[N];
+  vector<lower=0>[I] lambda_s_upd[N]; 
+  vector[I] G_s;
+  
+  z_s_upd[N] = z_upd[N];
+  lambda_s_upd[N] = lambda_upd[N];
+  
+  z_s_pred[1] = rep_vector(0,I);
+  lambda_s_pred[1] = rep_vector(1,I);
+  
+  for(n in 1:(N-1)){
+    int nn = N-n;
+    
+    z_s_pred[nn+1] = z_upd[nn];
+    lambda_s_pred[nn+1] = lambda_upd[nn] + sigmaz;
+    
+    G_s = lambda_upd[nn] ./ lambda_s_pred[nn+1];
+    z_s_upd[nn] = z_upd[nn] + G_s .* (z_s_upd[nn+1]-z_s_pred[nn+1]);
+    lambda_s_upd[nn] = lambda_upd[nn] + G_s .* (lambda_s_upd[nn+1]-lambda_s_pred[nn+1]) .* G_s;
   }
 }

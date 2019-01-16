@@ -5,7 +5,8 @@
 #' to classify the pairs as congruent or incongruent. The experimental variables are \emph{congruency} with two categorical levels (i.e., congruent, incongruent) and
 #' \emph{plausibility} with two categorical levels (i.e., plausible, implausible). Participants have to classify each stimulus as belonging to one of these four levels. 
 #' 
-#' The dataset contains two participants (I=2), each measured along three trials (J=3), two categorical variables (Q=2) each with two levels (K=2). Mouse-tracking trajectories are raw-data, i.e. they have not been previously pre-processed.
+#' The dataset contains two participants (I=2), each measured along three trials, two categorical variables (Q=2) each with two levels (K=2). The total number of trials is J=12.
+#' Mouse-tracking trajectories are raw-data, i.e. they have not been previously pre-processed.
 #' 
 #' @format A long-format dataframe of 728 observations containing 
 #'   information on the following variables.
@@ -29,10 +30,11 @@
 #' @description This dataset contains a subset of data originally presented in Barca & Pezzullo (2012). In this task 
 #' participants see a printed stimulus on the screen (e.g., water) and are requested 
 #' to perform a dichotomous choice task where the stimulus can be classified as word or non-word. The experimental variable is the \emph{stimulus type} with four categorical levels (i.e., high-frequency word, low-frequency word, pseudowords, and strings of letters). 
-#' Participants have to classify each stimulus as belonging to one of these four levels. 
+#' Participants have to classify each stimulus as belonging to word or non-word categories. 
 #' 
-#' The dataset contains five participants (I=5), each measured along three trials (J=3), one categorical variable (Q=1) with four levels (K=4). Mouse-tracking trajectories have previously been pre-processed with N=101 timesteps, translated into the first quadrant,
-#' and rotated so that the Target point (y_T) is always on the right-side.
+#' The dataset contains five participants (I=5), each measured along three trials, one categorical variable (Q=1) with four levels (K=4). The total number of trials is J=12. 
+#' Mouse-tracking trajectories have previously been pre-processed with N=101 timesteps, translated into the first quadrant,
+#' and rotated so that the Target point (y_T) is always on the right-side. 
 #' 
 #' 
 #' @format A long-format dataframe of 6060 observations containing 

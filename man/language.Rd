@@ -26,9 +26,10 @@ language
 This dataset contains a subset of data originally presented in Barca & Pezzullo (2012). In this task 
 participants see a printed stimulus on the screen (e.g., water) and are requested 
 to perform a dichotomous choice task where the stimulus can be classified as word or non-word. The experimental variable is the \emph{stimulus type} with four categorical levels (i.e., high-frequency word, low-frequency word, pseudowords, and strings of letters). 
-Participants have to classify each stimulus as belonging to one of these four levels. 
+Participants have to classify each stimulus as belonging to word or non-word categories. 
 
-The dataset contains five participants (I=5), each measured along three trials (J=3), one categorical variable (Q=1) with four levels (K=4). Mouse-tracking trajectories have previously been pre-processed with N=101 timesteps, translated into the first quadrant,
+The dataset contains five participants (I=5), each measured along three trials, one categorical variable (Q=1) with four levels (K=4). The total number of trials is J=12. 
+Mouse-tracking trajectories have previously been pre-processed with N=101 timesteps, translated into the first quadrant,
 and rotated so that the Target point (y_T) is always on the right-side.
 }
 \keyword{datasets}

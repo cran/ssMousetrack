@@ -25,9 +25,16 @@
   pkgdesc <- suppressWarnings(utils::packageDescription("ssMousetrack", lib.loc = ssMousetrackLib))
   if (length(pkgdesc) > 1) {
     builddate <- gsub(';.*$', '', pkgdesc$Packaged)
-    packageStartupMessage(paste("ssMousetrack (Version ", pkgdesc$Version, ", packaged: ", builddate, ")", sep = ""))
+    #packageStartupMessage(paste("ssMousetrack (Version ", pkgdesc$Version, ", packaged: ", builddate, ")", sep = ""))
+    pkgVs <- paste("ssMousetrack (Version ", pkgdesc$Version, ", packaged: ", builddate, ")", sep = "")
+    msg <- paste0("\n",
+                  pkgVs,
+                  "\n",
+                  "Please cite our work! Type citation(\"ssMousetrack\") for details.\n",
+                  "Submit your suggestions and bug-reports at: https://github.com/antcalcagni/ssMousetrack/issues\n"
+    )
+    packageStartupMessage(msg)
   }
-  packageStartupMessage("")
   packageStartupMessage("")
 }
 

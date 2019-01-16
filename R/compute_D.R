@@ -18,7 +18,7 @@
 
 compute_D <- function(Y=NULL,y_T=pi/4,y_D=(3*pi)/4){
   
-  DY <- mapply(function(i){ifelse(Y[,i] > ((y_T+y_D)/2),
+  DY <- mapply(function(i){ifelse(Y[,i] >= ((y_T+y_D)/2),
                             abs(Y[,i]-y_D),
                             abs(Y[,i]-y_T))},1:dim(Y)[2])
   

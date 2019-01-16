@@ -7,7 +7,7 @@
 check_prior(priors = NULL)
 }
 \arguments{
-\item{priors}{(list) a list of arguments specifying priors for each parameter involved in the model (see Details). If \code{priors=NULL} then predefined vague priors will be returned.}
+\item{priors}{(list) a list of arguments specifying priors for each parameter involved in the model (see Details). If \code{priors=NULL} then predefined priors will be returned.}
 }
 \value{
 a matrix contatining priors (numeric codes, see Details) and their parameters
@@ -21,7 +21,7 @@ The available options are as follows:
 \itemize{
 \item \code{lognormal(mu,sigma)} (code = 1, required parameters = 2)
 \item \code{normal(mu,sigma)} (code = 2, required parameters = 2)
-\item \code{normal(mu,sigma)T(min,max)} (code = 201, required parameters = at least 3)
+\item \code{normal(mu,sigma)T(min,max)} (code = 201, required parameters = 4)
 \item \code{chi_square(df)} (code = 3, required parameters = 1)
 \item \code{inv_chi_square(df)} (code = 4, required parameters = 1)
 \item \code{gamma(alpha,beta)} (code = 5, required parameters = 2)

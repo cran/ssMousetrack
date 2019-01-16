@@ -6,8 +6,9 @@
 \usage{
 generate_data(M = 100, N = 61, I = 10, J = 12, K = c(4),
   Z.type = c("symmetric"), Z.contrast = "treatment",
-  Z.formula = NULL, sigmax = 1, lambda = 1.5, yT = pi/4, yD = (3
-  * pi)/4, priors = "default", ...)
+  Z.formula = NULL, sigmax = 1, lambda = 1, yT = pi/4, yD = (3 *
+  pi)/4, kappa_bnds = c(120, 300), priors = "default",
+  gfunction = c("logistic", "gompertz"), ...)
 }
 \arguments{
 \item{M}{(integer) number of simulated datasets}
@@ -34,12 +35,16 @@ generate_data(M = 100, N = 61, I = 10, J = 12, K = c(4),
 
 \item{yD}{(numeric) position in angles of the distractor}
 
-\item{priors}{(list) a list of arguments specifying priors for each parameter involved in the model (see \code{\link{check_prior}}). If \code{priors="default"} then pre-defined vague priors will be used.}
+\item{kappa_bnds}{(array) array containing the lower and upper bounds for the kappa parameter (\code{default = c(120,300)})}
+
+\item{priors}{(list) a list of arguments specifying priors for each parameter involved in the model (see \code{\link{check_prior}}). If \code{priors="default"} then pre-defined priors will be used.}
+
+\item{gfunction}{(character) type of link function between latent states and observed data: 'logistic', 'gompertz' (\code{default = 'logistic'}).}
 
 \item{...}{other stan arguments (e.g., 'init', 'algorithm', 'sample_file'. See \code{\link[rstan:sampling]{sampling}})}
 }
 \value{
-a datalist containing simulated data
+a datalist containing simulated data and parameters
 }
 \description{
 Generate datasets according to the model structure
@@ -53,6 +58,11 @@ The function generates simulated datasets via Stan according to the model struct
 ## Generate mouse-tracking data for an univariate experimental design 
 ## with K = 3 categorical levels, J = 30 trials, I = 8 subjects
 X1 <- generate_data(I=5,J=12,K=3,Z.formula="~Z1",M=50)
+
+## Generate mouse-tracking data for an univariate experimental design 
+## by varying priors of parameters
+priors_list = list("normal(0,1)T(0,Inf)","normal(0,1)","normal(-2,0.5)")
+X1 <- generate_data(I=5,J=12,K=3,Z.formula="~Z1",M=50,priors=priors_list)
 
 ## Generate mouse-tracking data with two experimental factors Z1 and Z2, J = 9 trials, 
 ## K_Z1 = 3, K_Z2 = 3, I = 5 subjects

@@ -5,9 +5,10 @@
 \title{State-space modeling of mouse-tracking trajectories via Stan}
 \usage{
 run_ssm(N, I, J, Y = NULL, D = NULL, Z = NULL, sigmax = 1,
-  lambda = 1.5, y_T = pi/4, y_D = (3 * pi)/4, priors = "default",
-  kappa_bnds = c(5, 300), nchains = 1, niter = 2000, nwarmup = 500,
-  ncores = "AUTO", stan_object = FALSE, ...)
+  lambda = 1, y_T = pi/4, y_D = (3 * pi)/4, priors = "default",
+  gfunction = c("logistic", "gompertz"), kappa_bnds = c(5, 300),
+  nchains = 1, niter = 2000, nwarmup = 500, ncores = "AUTO",
+  stan_object = FALSE, ...)
 }
 \arguments{
 \item{N}{(integer) length of the Y-trajectories}
@@ -30,7 +31,9 @@ run_ssm(N, I, J, Y = NULL, D = NULL, Z = NULL, sigmax = 1,
 
 \item{y_D}{(numeric) position in angles of the distractor}
 
-\item{priors}{(list) a list of arguments specifying priors for each parameter involved in the model (see \code{\link{check_prior}}). If \code{priors="default"} then pre-defined vague priors will be used.}
+\item{priors}{(list) a list of arguments specifying priors for each parameter involved in the model (see \code{\link{check_prior}}). If \code{priors="default"} then pre-defined tpriors will be used.}
+
+\item{gfunction}{(character) type of link function between latent states and observed data: 'logistic', 'gompertz' (\code{default = 'logistic'}).}
 
 \item{kappa_bnds}{(array) array containing the lower and upper bounds for the kappa parameter (\code{default = c(5,300)})}
 
@@ -65,7 +68,7 @@ X1 <- generate_data(I=5,J=12,K=3,Z.formula="~Z1")
 iid <- 23 # keep just one dataset from the simulated set of datasets
 # Run the state-space model on the chosen dataset
 X1_fit <- run_ssm(N = X1$N,I = X1$I,J = X1$J,Y = X1$data$Y[iid,,],D = X1$data$D[iid,,],
-Z = X1$data$Z,niter=100,nwarmup=25)
+Z = X1$data$Z)
 
 ## Fit a state-space model using the experimental dataset language
 # The dataset is ready to be used and it does not need to be pre-processed (preprocess=FALSE). 
@@ -73,7 +76,8 @@ Z = X1$data$Z,niter=100,nwarmup=25)
 # the x-y trajectories
 X2 <- prepare_data(X = language, preprocess = FALSE, Z.formula = "~condition")
 # Run the state-space model on the chosen dataset
-X2_fit <- run_ssm(N = X2$N,I = X2$I,J = X2$J,Y = X2$Y,D = X2$D,Z = X2$Z,niter=50,nwarmup=15)
+X2_fit <- run_ssm(N = X2$N,I = X2$I,J = X2$J,Y = X2$Y,D = X2$D,Z = X2$Z,
+niter=5000,nchains=2)
 
 ## Fit a state-space model using the experimental dataset congruency
 # The dataset needs to be pre-processed (preprocess=TRUE)
@@ -84,7 +88,7 @@ KK <- dim(X3$Z)[2] # number of model parameters implied by the design matrix Z
 priors_list <- list("lognormal(1,0.5)","pareto(3,5.25)","normal(0,2.5)")
 # note that length(priors_list) = KK 
 # Run the state-space model on the chosen dataset
-X3_fit <- run_ssm(N = X3$N,I = X3$I,J = X3$J,Y = X3$Y,D = X3$D,Z = X3$Z,niter=50,
-nwarmup=15,priors=priors_list)
+X3_fit <- run_ssm(N = X3$N,I = X3$I,J = X3$J,Y = X3$Y,D = X3$D,Z = X3$Z,
+niter=10000,nwarmup=3500,priors=priors_list,nchains=4)
 }
 }

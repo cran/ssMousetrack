@@ -31,7 +31,13 @@ evaluate_ssm <- function(ssmfit=NULL,M=100,plotx=TRUE){
   if(M<0)
     stop("Positive integers should be provided for M")
   
-  I <- ssmfit$I; J <- ssmfit$J; N <- ssmfit$N; Z <- ssmfit$data$Z; Y <- ssmfit$data$Y
+  I <- ssmfit$I; J <- ssmfit$J; N <- ssmfit$N; Z <- ssmfit$data$Z; Y <- ssmfit$data$Y; gfunction <- ssmfit$Gfunction
+  
+  if(gfunction=="logistic"){
+    gfunc <- function(lb,r,b,x){lb + (r / ( 1 + exp(b - x)))}
+  }else if(gfunction=="gompertz"){
+    gfunc <- function(lb,r,b,x){lb + (r * exp(-b * exp(-x)))}
+  }
   
   Y_m <- array(0,c(N,I*J,M))
   PA_ov <- rep(NA,M)
@@ -50,23 +56,24 @@ evaluate_ssm <- function(ssmfit=NULL,M=100,plotx=TRUE){
   for(m in 1:length(iidm)){ # outer loop over m=1...M
     
     mu_m=matrix(NA,N,I*J)
-    for(n in 1:N){ # innter loop over n=1...N
-      b <- Z%*%t(ssmfit$params$gamma[iidm[m],])
+    b <- Z%*%t(ssmfit$params$gamma[iidm[m],])
+    Y_m[1,,m] <- Y[1,] # do not consider the step n=0 in the evaluation
+    for(n in 2:N){ # innter loop over n=1...N
       xv <- rep(ssmfit$data$X[iidm[m],n,],each=J)
-      mu_m[n,] <- bnds[,1] + ((bnds[,2]-bnds[,1])*exp(-b*exp(-xv))  )
+      mu_m[n,] <- gfunc(bnds[,1],bnds[,3],b,xv)
       expx <- exp(ssmfit$params$lambda*ssmfit$data$D[n,])
       kappa1 <- ssmfit$params$kappa_bnds[1] + ((expx-min(expx)) / (max(expx)-min(expx))) * (ssmfit$params$kappa_bnds[2]-ssmfit$params$kappa_bnds[1])
       Y_m[n,,m] <- mapply(function(k){CircStats::rvm(n=1,mean = mu_m[n,k],k = kappa1[k])},1:(I*J))
     }
-      
+    
     PA_ov[m] <- max(1-norm(Y_m[,,m]-Y)^2/norm(Y)^2,0) # overall percentage of reconstruction
     PA_sbj[m,] <- max(mapply(function(i){1-norm(Y_m[,iid==i,m]-Y[,iid==i])^2/norm(Y[,iid==i])^2},1:I),0) # by subject percentage of reconstruction
     dtws[m,] <- max(mapply(function(i){dtw::dtw(Y_m[,i,m],Y[,i])$normalizedDistance},1:(I*J)),0) # dtw distance
     
   }
   
-  dataout <- list(PA_ov = PA_ov,PA_sbj = PA_sbj)
-  
+  dataout <- list(dist = list(PA_ov = PA_ov,PA_sbj = PA_sbj, DTW = dtws), 
+                  indices = list(PA_ov = mean(PA_ov),PA_sbj = mean(PA_sbj), DTW = mean(dtws)))
   
   if(plotx==TRUE){
     data_plot=data.frame(y=as.vector(PA_sbj),x=rep(1:I,each=M))

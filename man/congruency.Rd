@@ -29,6 +29,7 @@ participants see sentence and scene pairs that varied in plausibility and are re
 to classify the pairs as congruent or incongruent. The experimental variables are \emph{congruency} with two categorical levels (i.e., congruent, incongruent) and
 \emph{plausibility} with two categorical levels (i.e., plausible, implausible). Participants have to classify each stimulus as belonging to one of these four levels. 
 
-The dataset contains two participants (I=2), each measured along three trials (J=3), two categorical variables (Q=2) each with two levels (K=2). Mouse-tracking trajectories are raw-data, i.e. they have not been previously pre-processed.
+The dataset contains two participants (I=2), each measured along three trials, two categorical variables (Q=2) each with two levels (K=2). The total number of trials is J=12.
+Mouse-tracking trajectories are raw-data, i.e. they have not been previously pre-processed.
 }
 \keyword{datasets}
