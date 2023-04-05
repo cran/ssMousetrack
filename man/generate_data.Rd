@@ -4,11 +4,24 @@
 \alias{generate_data}
 \title{Generate datasets according to the model structure}
 \usage{
-generate_data(M = 100, N = 61, I = 10, J = 12, K = c(4),
-  Z.type = c("symmetric"), Z.contrast = "treatment",
-  Z.formula = NULL, sigmax = 1, lambda = 1, yT = pi/4, yD = (3 *
-  pi)/4, kappa_bnds = c(120, 300), priors = "default",
-  gfunction = c("logistic", "gompertz"), ...)
+generate_data(
+  M = 100,
+  N = 61,
+  I = 10,
+  J = 12,
+  K = c(4),
+  Z.type = c("symmetric"),
+  Z.contrast = "treatment",
+  Z.formula = NULL,
+  sigmax = 1,
+  lambda = 1,
+  yT = pi/4,
+  yD = (3 * pi)/4,
+  kappa_bnds = c(120, 300),
+  priors = "default",
+  gfunction = c("logistic", "gompertz"),
+  ...
+)
 }
 \arguments{
 \item{M}{(integer) number of simulated datasets}

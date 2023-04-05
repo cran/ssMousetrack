@@ -4,8 +4,15 @@
 \alias{prepare_data}
 \title{Prepare mouse-tracking trajectories for state-space modeling via Stan}
 \usage{
-prepare_data(X = NULL, preprocess = TRUE, N = 61, Z.formula = NULL,
-  Z.contrast = "treatment", yT = "AUTO", yD = "AUTO")
+prepare_data(
+  X = NULL,
+  preprocess = TRUE,
+  N = 61,
+  Z.formula = NULL,
+  Z.contrast = "treatment",
+  yT = "AUTO",
+  yD = "AUTO"
+)
 }
 \arguments{
 \item{X}{(dataframe) a data frame of x-y trajectories and experimental design (see \code{Details})}

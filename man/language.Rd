@@ -4,7 +4,8 @@
 \name{language}
 \alias{language}
 \title{Mouse-tracking experiment of a lexical decision task}
-\format{A long-format dataframe of 6060 observations containing 
+\format{
+A long-format dataframe of 6060 observations containing 
   information on the following variables.
 \describe{
  \item{sbj}{The ID number of participants}
@@ -13,7 +14,8 @@
  \item{x}{The recorded x-trajectories}
  \item{y}{The recorded y-trajectories}
  \item{trial}{The ID number of trials}
-}}
+}
+}
 \source{
 Barca, L., & Pezzulo, G. (2012). 
 Unfolding visual lexical decision in time. 

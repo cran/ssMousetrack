@@ -1,8 +1,17 @@
-== Version 1.1.5 (2019-01-15)
+# ssMousetrack 1.1.6
 
-# Fix bugs in 'generate_data()' and 'evaluate_ssm()'
-# Corrected typo-errors in the Manual    
-# Added generalized logistic function as option in 'generate_data()' and 'run_ssm()'
-# Added BugReports link in the Manual
-# Added references in the Manual
+### Features
+- adapted to work with newest RStan and StanHeaders
+- added references in the Manual
+
+# ssMousetrack 1.1.5
+
+### Bug fixes
+- fixed bugs in `generate_data()` and `evaluate_ssm()`.
+- corrected typo-errors in the Manual
+
+### Features
+- added generalized logistic function as option in `generate_data()` and `run_ssm()`.
+- added BugReports link in the Manual
+- added references in the Manual
 
